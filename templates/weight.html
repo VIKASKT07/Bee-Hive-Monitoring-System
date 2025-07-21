@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weight Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts: Poppins & Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body class="weight-bg">
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <h1>Smart Beehive Monitoring System</h1>
+            </div>
+            <div class="header-actions">
+                <a href="/" class="primary-button"><i class="fas fa-home"></i> Back to Home</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-adjust"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="app-content">
+        <h2 style="text-align:center;"><i class="fas fa-balance-scale"></i> Live Weight Dashboard (Last 30 Weights)</h2>
+        <section class="data-table-section" style="margin-top:2rem;">
+            <table id="weightTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Weight (g)</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will load here dynamically -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer class="app-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;z-index:10;">
+        <p style="margin:0; color:#fff; font-family:'Poppins', 'Nunito', Arial, sans-serif; font-size:1rem; text-align:center;">&copy; 2025 Smart Beehive Monitoring System</p>
+    </footer>
+    <script>
+        // Theme toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        themeBtn.onclick = function() {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        };
+        if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
+        // Data fetching
+        function fetchWeights() {
+            fetch('/api/weight/last/30')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#weightTable tbody');
+                    tableBody.innerHTML = '';
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.weight.toFixed(2)}</td>
+                            <td>${new Date(item.timestamp).toLocaleString()}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching weight data:', error));
+        }
+        fetchWeights();
+        setInterval(fetchWeights, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Beehive Monitor - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Fonts: Poppins & Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homestyle.css') }}" />
+</head>
+<body class="home-bg">
+    <!-- Connection Status Indicator -->
+    <div id="connection-status" class="connection-status hidden">
+        <i class="fas fa-wifi"></i>
+        <span id="connection-text">Connected</span>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-hive bee-icon"></i>
+                    </div>
+                    <div>
+                        <h1>Smart Beehive Monitor</h1>
+                        <div class="tagline">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button id="refresh-btn" class="refresh-btn" aria-label="Refresh data" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle Theme">
+                        <i class="fas fa-adjust"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-content">
+            <div class="navigation-buttons">
+                <a href="/gas" class="primary-button">
+                    <i class="fas fa-wind"></i> 
+                    <span>Gas Values</span>
+                </a>
+                <a href="/weight" class="primary-button">
+                    <i class="fas fa-balance-scale"></i> 
+                    <span>Weight Stats</span>
+                </a>
+            </div>
+
+            <section class="about-section">
+                <div class="about-card card">
+                    <h2><i class="fas fa-info-circle icon"></i>About this Project</h2>
+                    <p>This project uses <strong>ESP32</strong>, gas sensors, and a load cell with <strong>HX711</strong> to monitor gas levels (e.g., CO₂ or dangerous gases) and hive weight. Real-time data is pushed to this dashboard using a <strong>Flask</strong> server backend with <strong>SQLite</strong> storage.</p>
+                </div>
+                <div class="monitor-button-container">
+                    <button id="monitor-btn" class="primary-button monitor-button">
+                        <i class="fas fa-bolt"></i> 
+                        <span>Monitor Live Data</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="data-section" class="data-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    LIVE SENSOR DATA
+                </h2>
+                <div class="sensor-grid">
+                    <div class="card sensor-card" id="gas-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-wind icon"></i> Latest Gas Level</h3>
+                            <div class="loading-indicator" id="gas-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sensor-value">
+                                <span id="gas-value">--</span> 
+                                <span class="unit">ppm</span>
+                            </div>
+                            <p class="timestamp" id="gas-time">--</p>
+                            <div class="sensor-status" id="gas-status"></div>
+                        </div>
+                    </div>
+
+                    <div class="card sensor-card" id="weight-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-balance-scale icon"></i> Latest Beehive Weight</h3>
+                            <div class="loading-indicator" id="weight-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sensor-value">
+                                <span id="weight-value">--</span> 
+                                <span class="unit">g</span>
+                            </div>
+                            <p class="timestamp" id="weight-time">--</p>
+                            <div class="weight-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="weight-progress"></div>
+                                </div>
+                                <div class="progress-labels">
+                                    <span>0g</span>
+                                    <span>200g</span>
+                                    <span>500g</span>
+                                </div>
+                            </div>
+                            <div id="weight-alert" class="alert-message"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Update Info -->
+                <div class="last-update">
+                    <i class="fas fa-clock"></i>
+                    <span>Last updated: <span id="last-update-time">--</span></span>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>
+                <i class="fas fa-copyright"></i>
+                2025 Smart Beehive Monitoring System - IoT Dashboard
+            </p>
+        </footer>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="toast error-toast hidden">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="error-message">Error occurred</span>
+        <button id="close-error" class="close-btn">&times;</button>
+    </div>
+
+    <script src="static/js/home.js"></script>
+</body>
+</html>

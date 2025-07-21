@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DhoomaBhedha – Gas Monitor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Fonts: Poppins & Nunito -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body class="gas-bg">
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-container">
+          <h1>Smart Beehive Monitoring System</h1>
+        </div>
+        <div class="header-actions">
+          <a href="/" class="primary-button"><i class="fas fa-home"></i> Back to Home</a>
+          <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+            <!-- <i class="fas fa-adjust"></i> -->
+          </button>
+        </div>
+      </div>
+    </header>
+    <main class="app-content">
+      <section class="dashboard-header">
+        <h2><i class="fas fa-wind"></i> Gas Monitor – Live Events</h2>
+        <div class="dashboard-actions">
+          <div class="stats-summary">
+            <div class="stat-item">
+              <span class="stat-label">Latest Reading</span>
+              <span class="stat-value" id="latest-value">--</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Alerts</span>
+              <span class="stat-value">30</span>
+            </div>
+          </div>
+          <a href="{{ url_for('predict') }}" class="primary-button predict-button">
+            <i class="fas fa-chart-line"></i> Predict Levels
+          </a>
+        </div>
+      </section>
+      <section class="data-table-section">
+        <div class="table-header">
+          <h3><i class="fas fa-list"></i> Recent Gas Readings</h3>
+          <div class="loading-indicator" id="loading-indicator">
+            <div class="spinner"></div>
+            <span>Updating...</span>
+          </div>
+        </div>
+        <table id="gasTable" class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Value&nbsp;(ppm)</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+    <footer class="app-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;z-index:10;">
+      <p style="margin:0; color:#fff; font-family:'Poppins', 'Nunito', Arial, sans-serif; font-size:1rem; text-align:center;">&copy; 2025 Smart Beehive Monitoring System</p>
+    </footer>
+  </div>
+  <script>
+    // Theme toggle
+    const themeBtn = document.getElementById('theme-toggle');
+    themeBtn.onclick = function() {
+      document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    };
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
+    // Data fetching
+    const apiUrl = '/api/gas/last/30';
+    async function fetchData(){
+      try{
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        const latest = data[0];
+        document.getElementById('latest-value').textContent = `${latest.value} `;
+        renderTable(data);
+      }catch(err){
+        console.error('Fetch error', err);
+      }
+    }
+    function renderTable(rows){
+      const tbody = document.querySelector('#gasTable tbody');
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        const statusClass = r.value > 1000 ? 'status-alert' : 'status-ok';
+        tr.innerHTML = `<td>${r.id}</td><td class="${statusClass}">${r.value}</td><td>${new Date(r.timestamp).toLocaleString()}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    fetchData();
+    setInterval(fetchData, 3000);
+  </script>
+  <script src="static/js/dashboard.js"></script>
+</body>
+</html>
